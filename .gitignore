@@ -1,0 +1,4 @@
+# Packed snap
+*.snap
+# Logs from `snapcraft remote-build`
+snapcraft-just-*.txt

@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+jobs:
+  release:
+    name: Release the snap
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - amd64
+          - arm64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build snap
+        uses: canonical/action-build@v1
+        id: build
+        env:
+          CRAFT_BUILD_FOR: ${{ matrix.platform }}
+      - name: Release to edge
+        uses: canonical/action-publish@v1
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
