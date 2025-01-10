@@ -23,12 +23,15 @@ jobs:
         id: build
         uses: canonical/action-build@v1
       - name: Install snap (test)
+        env:
+          SNAP_PATH: "${{ steps.build.outputs.snap }}"
+          SNAP_VERSION: "${{ steps.get-version.outputs.snap_version }}"
         run: |
-          sudo snap install --dangerous --classic ${{ steps.build.outputs.snap }}
+          sudo snap install --dangerous --classic "$SNAP_PATH"
           just --version  # Make sure that just is working
           just_version=$(just --version)
-          if [[ "$snap_version" != "$just_version"]]; then
+          if [[ "$SNAP_VERSION" != "$just_version" ]]; then
             echo "The snap version differs from the Just version!"
-            echo "snap ($snap_version) != just ($just_version)"
+            echo "snap ($SNAP_VERSION) != just ($just_version)"
             exit 1
           fi
