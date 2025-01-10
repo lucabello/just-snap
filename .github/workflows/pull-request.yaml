@@ -27,7 +27,7 @@ jobs:
           sudo snap install --dangerous --classic ${{ steps.build.outputs.snap }}
           just --version  # Make sure that just is working
           just_version=$(just --version)
-          if [[ "$snap_version" != "$just_version"]]; then
+          if [[ "$snap_version" != "$just_version" ]]; then
             echo "The snap version differs from the Just version!"
             echo "snap ($snap_version) != just ($just_version)"
             exit 1
