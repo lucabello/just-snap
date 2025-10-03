@@ -18,7 +18,7 @@ jobs:
           CONCIERGE_LXD_CHANNEL: 6/stable
         run: |
           sudo snap install concierge --classic
-          sudo concierge prepare --profile crafts
+          sudo concierge prepare -p crafts
           sudo snap install lxd --channel="$LXD_CHANNEL"
           lxd init --auto
       - name: Run the tests
