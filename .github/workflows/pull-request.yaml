@@ -14,6 +14,12 @@ jobs:
         with:
           fetch-depth: 1
       - name: Install dependencies
-        run: sudo snap install snapcraft --classic
+        env:
+          LXD_CHANNEL: 6/stable
+        run: |
+          sudo snap install snapcraft --classic
+          sudo snap install lxd --channel="$LXD_CHANNEL"
+          lxd init --auto
       - name: Run the tests
-        run: snapcraft test --platform=amd64
+        run: |
+          snapcraft test --platform=amd64
