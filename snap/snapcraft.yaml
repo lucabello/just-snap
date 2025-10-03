@@ -6,6 +6,19 @@ summary: 🤖 Just a command runner.
 description: |
   just is a handy way to save and run project-specific commands. 
   Commands, called recipes, are stored in a file called justfile with syntax inspired by make.
+contact: luca.bello@canonical.com
+license: Apache-2.0
+donation:
+  - https://github.com/sponsors/casey
+  - https://ko-fi.com/lucabello
+issues:
+  - https://github.com/casey/just/issues
+  - https://github.com/lucabello/just-snap/issues
+source-code:
+  - https://github.com/casey/just
+website: https://just.systems
+
+
 
 grade: stable
 confinement: classic
@@ -40,6 +53,7 @@ parts:
     build-attributes:
       - enable-patchelf
     override-build: |
+      rustup default stable
       rustup target add $CARGO_BUILD_TARGET
       RUSTFLAGS="--codegen target-feature=+crt-static" cargo build --target $CARGO_BUILD_TARGET --release
       install -Dvm755 target/$CARGO_BUILD_TARGET/release/just "${CRAFT_PART_INSTALL}"
