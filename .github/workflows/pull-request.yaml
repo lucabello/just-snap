@@ -15,4 +15,4 @@ jobs:
           fetch-depth: 1
       - name: Run the tests
         run: |
-          snpacraft test --platform=amd64
+          snapcraft test --platform=amd64
