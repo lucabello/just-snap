@@ -15,9 +15,10 @@ jobs:
           fetch-depth: 1
       - name: Install dependencies
         env:
-          LXD_CHANNEL: 6/stable
+          CONCIERGE_LXD_CHANNEL: 6/stable
         run: |
-          sudo snap install snapcraft --classic
+          sudo snap install concierge --classic
+          sudo concierge -p crafts
           sudo snap install lxd --channel="$LXD_CHANNEL"
           lxd init --auto
       - name: Run the tests
