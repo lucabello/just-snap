@@ -1,7 +1,7 @@
 name: just
 title: just (by casey)
 base: core24
-version: 1.46.0  
+version: 1.46.0
 summary: 🤖 Just a command runner.
 description: |
   just is a handy way to save and run project-specific commands. 
