@@ -14,6 +14,7 @@ jobs:
     env:
       SNAP_NAME: just
       UPSTREAM_REPO: casey/just
+      RELEASE_PREFIX: ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -37,7 +38,7 @@ jobs:
         id: compare
         run: |
           UPSTREAM_VERSION="${{ steps.upstream.outputs.version }}"
-          CURRENT_VERSION="${{ steps.current.outputs.version }}"
+          CURRENT_VERSION="${{ env.RELEASE_PREFIX }}${{ steps.current.outputs.version }}"
           
           echo "Upstream version: ${UPSTREAM_VERSION}"
           echo "Current version: ${CURRENT_VERSION}"
@@ -63,7 +64,9 @@ jobs:
         if: steps.compare.outputs.needs_update == 'true'
         run: |
           UPSTREAM_VERSION="${{ steps.upstream.outputs.version }}"
-          sed -i "s/^version:.*/version: ${UPSTREAM_VERSION}/" snap/snapcraft.yaml
+          # Remove prefix from version before setting in snapcraft.yaml
+          NEW_VERSION="${UPSTREAM_VERSION#${{ env.RELEASE_PREFIX }}}"
+          sed -i "s/^version:.*/version: ${NEW_VERSION}/" snap/snapcraft.yaml
 
       - name: Create Pull Request
         if: steps.compare.outputs.needs_update == 'true'
