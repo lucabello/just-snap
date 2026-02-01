@@ -2,7 +2,6 @@ name: Update from upstream
 
 on:
   schedule:
-    # Run daily at 00:00 UTC
     - cron: '0 6 1 * *'
   workflow_dispatch:
 
