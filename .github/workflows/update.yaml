@@ -11,6 +11,9 @@ permissions:
 
 jobs:
   check-release:
+    env:
+      SNAP_NAME: just
+      UPSTREAM_REPO: casey/just
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,7 +22,7 @@ jobs:
       - name: Get latest upstream release
         id: upstream
         run: |
-          LATEST_VERSION=$(gh release view --repo casey/just --json tagName --jq '.tagName')
+          LATEST_VERSION=$(gh release view --repo ${{ env.UPSTREAM_REPO }} --json tagName --jq '.tagName')
           echo "version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,19 +71,19 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
-          commit-message: "chore: bump just to ${{ steps.upstream.outputs.version }}"
-          title: "chore: bump just to ${{ steps.upstream.outputs.version }}"
+          commit-message: "chore: bump ${{ env.SNAP_NAME }} to ${{ steps.upstream.outputs.version }}"
+          title: "chore: bump ${{ env.SNAP_NAME }} to ${{ steps.upstream.outputs.version }}"
           body: |
-            This PR updates `just` to version ${{ steps.upstream.outputs.version }}.
+            This PR updates `${{ env.SNAP_NAME }}` to version ${{ steps.upstream.outputs.version }}.
             
             **Changes:**
             - Updated version in snap/snapcraft.yaml from ${{ steps.current.outputs.version }} to ${{ steps.upstream.outputs.version }}
             
             **Release notes:**
-            https://github.com/casey/just/releases/tag/${{ steps.upstream.outputs.version }}
+            https://github.com/${{ env.UPSTREAM_REPO }}/releases/tag/${{ steps.upstream.outputs.version }}
             
             This PR was automatically created by the check-upstream-release workflow.
-          branch: update-just-${{ steps.upstream.outputs.version }}
+          branch: chore/bump-to-${{ steps.upstream.outputs.version }}
           delete-branch: true
           labels: |
             dependencies
