@@ -1,11 +1,9 @@
 name: just
 title: just (by casey)
 base: core24
-version: 1.51.0
-summary: 🤖 Just a command runner.
-description: |
-  just is a handy way to save and run project-specific commands. 
-  Commands, called recipes, are stored in a file called justfile with syntax inspired by make.
+version: 1.54.0
+summary: "\U0001F916 Just a command runner."
+description: "just is a handy way to save and run project-specific commands. \nCommands, called recipes, are stored in a file called justfile with syntax inspired by make.\n"
 contact: luca.bello@canonical.com
 license: Apache-2.0
 donation:
@@ -17,12 +15,8 @@ issues:
 source-code:
   - https://github.com/casey/just
 website: https://just.systems
-
-
-
 grade: stable
 confinement: classic
-
 platforms:
   amd64:
   arm64:
@@ -31,7 +25,6 @@ platforms:
   riscv64:
     build-on: ["amd64", "riscv64"]
     build-for: ["riscv64"]
-
 parts:
   just:
     plugin: rust
@@ -41,26 +34,26 @@ parts:
       just: bin/just
     build-environment:
       - to amd64:
-        - CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
+          - CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
       - to arm64:
-        - CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-        - CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
-        - CC: aarch64-linux-gnu-gcc
+          - CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          - CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
+          - CC: aarch64-linux-gnu-gcc
       - to riscv64:
-        - CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc
-        - CARGO_BUILD_TARGET: riscv64gc-unknown-linux-gnu
-        - CC: riscv64-linux-gnu-gcc
+          - CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc
+          - CARGO_BUILD_TARGET: riscv64gc-unknown-linux-gnu
+          - CC: riscv64-linux-gnu-gcc
     build-packages:
       - to amd64:
-        - mingw-w64
+          - mingw-w64
       - to arm64:
-        - gcc-aarch64-linux-gnu
-        - linux-libc-dev-arm64-cross
-        - libc6-dev-arm64-cross
+          - gcc-aarch64-linux-gnu
+          - linux-libc-dev-arm64-cross
+          - libc6-dev-arm64-cross
       - to riscv64:
-        - gcc-riscv64-linux-gnu
-        - linux-libc-dev-riscv64-cross
-        - libc6-dev-riscv64-cross
+          - gcc-riscv64-linux-gnu
+          - linux-libc-dev-riscv64-cross
+          - libc6-dev-riscv64-cross
     build-attributes:
       - enable-patchelf
     override-build: |
@@ -68,7 +61,6 @@ parts:
       rustup target add $CARGO_BUILD_TARGET
       RUSTFLAGS="--codegen target-feature=+crt-static" cargo build --target $CARGO_BUILD_TARGET --release
       install -Dvm755 target/$CARGO_BUILD_TARGET/release/just "${CRAFT_PART_INSTALL}"
-
 apps:
   just:
     command: bin/just
