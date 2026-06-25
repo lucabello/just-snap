@@ -3,21 +3,22 @@ name: Pull Request
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test snap
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Install dependencies
         run: |
-          sudo snap install snapcraft --classic
-          sudo snap install just --classic
-          sudo snap install yq
+          sudo snap install concierge --classic
+          sudo concierge prepare -p crafts --extra-snaps=just,yq
 
       - name: Run the tests
         run: just test latest
