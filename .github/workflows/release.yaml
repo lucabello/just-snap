@@ -5,13 +5,17 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   release:
-    name: Build and release snap
-    runs-on: ubuntu-latest
+    name: Build and release snap (${{ matrix.platform }})
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -25,9 +29,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo snap install snapcraft --classic
-          sudo snap install just --classic
-          sudo snap install yq
+          sudo snap install concierge --classic
+          sudo concierge prepare -p crafts --extra-snaps=just,yq
 
       - name: Build snap
         run: just pack latest ${{ matrix.platform }}
