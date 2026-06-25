@@ -1,0 +1,4 @@
+Latest release for casey/just is 1.54.0
+Updating latest/ folder to version 1.54.0 ...
+✓ Updated latest/ to 1.54.0
+→ No 1.54/ folder exists, skipping track-specific update
