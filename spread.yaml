@@ -1,23 +1,13 @@
-project: just-snap
+project: just
 
 backends:
   craft:
     type: craft
+    allocate: "false"
     systems:
-      - ubuntu-24.04
-      # Uncomment to test on more systems
-      #- ubuntu-22.04
-      #- ubuntu-20.04
+      - ubuntu-24.04:
 
 suites:
   spread/general/:
-    summary: General integration tests
-    prepare: |
-      snap install "$CRAFT_ARTIFACT" --dangerous --jailmode --classic
-    restore: |
-      snap remove just-snap --purge --terminate
-
-exclude:
-  - .git
-
-kill-timeout: 1h
+    summary: Integration tests for the snap
+    kill_timeout: 20m

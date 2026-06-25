@@ -2,7 +2,7 @@ name: Update from upstream
 
 on:
   schedule:
-    - cron: '0 6 1 * *'
+    - cron: '0 6 1,15 * *'
   workflow_dispatch:
 
 permissions:
@@ -10,83 +10,48 @@ permissions:
   pull-requests: write
 
 jobs:
-  check-release:
-    env:
-      SNAP_NAME: just
-      UPSTREAM_REPO: casey/just
-      RELEASE_PREFIX: ''
+  update:
     runs-on: ubuntu-latest
+    env:
+      UPSTREAM_REPO: casey/just
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get latest upstream release
-        id: upstream
+      - name: Install dependencies
         run: |
-          LATEST_VERSION=$(gh release view --repo ${{ env.UPSTREAM_REPO }} --json tagName --jq '.tagName')
-          echo "version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
+          sudo snap install just --classic
+          sudo snap install yq
+
+      - name: Run update
+        id: update
+        run: |
+          just update ${{ env.UPSTREAM_REPO }} 2>&1 | tee update_output.txt
+          if grep -q "Already at version\|nothing to do" update_output.txt; then
+            echo "needs_pr=false" >> $GITHUB_OUTPUT
+          else
+            echo "needs_pr=true" >> $GITHUB_OUTPUT
+            NEW_VERSION=$(yq -r '.version' latest/snap/snapcraft.yaml)
+            echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Get current version
-        id: current
-        run: |
-          CURRENT_VERSION=$(grep '^version:' snap/snapcraft.yaml | awk '{print $2}')
-          echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Compare versions
-        id: compare
-        run: |
-          UPSTREAM_VERSION="${{ steps.upstream.outputs.version }}"
-          CURRENT_VERSION="${{ env.RELEASE_PREFIX }}${{ steps.current.outputs.version }}"
-          
-          echo "Upstream version: ${UPSTREAM_VERSION}"
-          echo "Current version: ${CURRENT_VERSION}"
-          
-          # Function to compare semantic versions
-          version_gt() {
-            # Returns 0 (true) if $1 > $2
-            test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
-          }
-          
-          if [ "${UPSTREAM_VERSION}" = "${CURRENT_VERSION}" ]; then
-            echo "needs_update=false" >> $GITHUB_OUTPUT
-            echo "Already up to date"
-          elif version_gt "${UPSTREAM_VERSION}" "${CURRENT_VERSION}"; then
-            echo "needs_update=true" >> $GITHUB_OUTPUT
-            echo "New version available: ${UPSTREAM_VERSION} > ${CURRENT_VERSION}"
-          else
-            echo "needs_update=false" >> $GITHUB_OUTPUT
-            echo "Upstream version ${UPSTREAM_VERSION} is not greater than current ${CURRENT_VERSION}, skipping"
-          fi
-
-      - name: Update snapcraft.yaml
-        if: steps.compare.outputs.needs_update == 'true'
-        run: |
-          UPSTREAM_VERSION="${{ steps.upstream.outputs.version }}"
-          # Remove prefix from version before setting in snapcraft.yaml
-          NEW_VERSION="${UPSTREAM_VERSION#${{ env.RELEASE_PREFIX }}}"
-          sed -i "s/^version:.*/version: ${NEW_VERSION}/" snap/snapcraft.yaml
-
       - name: Create Pull Request
-        if: steps.compare.outputs.needs_update == 'true'
-        id: create_pr
+        if: steps.update.outputs.needs_pr == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
-          commit-message: "chore: bump ${{ env.SNAP_NAME }} to ${{ steps.upstream.outputs.version }}"
-          title: "chore: bump ${{ env.SNAP_NAME }} to ${{ steps.upstream.outputs.version }}"
+          commit-message: "chore: bump just to ${{ steps.update.outputs.version }}"
+          title: "chore: bump just to ${{ steps.update.outputs.version }}"
           body: |
-            This PR updates `${{ env.SNAP_NAME }}` to version ${{ steps.upstream.outputs.version }}.
-            
-            **Changes:**
-            - Updated version in snap/snapcraft.yaml from ${{ steps.current.outputs.version }} to ${{ steps.upstream.outputs.version }}
-            
+            This PR updates `just` to version ${{ steps.update.outputs.version }}.
+
             **Release notes:**
-            https://github.com/${{ env.UPSTREAM_REPO }}/releases/tag/${{ steps.upstream.outputs.version }}
-            
-            This PR was automatically created by the check-upstream-release workflow.
-          branch: chore/bump-to-${{ steps.upstream.outputs.version }}
+            https://github.com/${{ env.UPSTREAM_REPO }}/releases/tag/${{ steps.update.outputs.version }}
+
+            This PR was automatically created by the update workflow.
+          branch: chore/bump-to-${{ steps.update.outputs.version }}
           delete-branch: true
           labels: |
             dependencies
