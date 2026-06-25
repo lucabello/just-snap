@@ -3,24 +3,22 @@ name: Pull Request
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     name: Test snap
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+
       - name: Install dependencies
-        env:
-          CONCIERGE_LXD_CHANNEL: 6/stable
         run: |
           sudo snap install concierge --classic
-          sudo concierge prepare -p crafts
-          sudo snap install lxd --channel="$LXD_CHANNEL"
-          lxd init --auto
+          sudo concierge prepare -p crafts --extra-snaps=just,yq
+
       - name: Run the tests
-        run: |
-          snapcraft test --platform=amd64
+        run: just test latest
