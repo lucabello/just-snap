@@ -28,6 +28,9 @@ platforms:
   arm64:
     build-on: ["amd64", "arm64"]
     build-for: ["arm64"]
+  riscv64:
+    build-on: ["amd64", "riscv64"]
+    build-for: ["riscv64"]
 
 parts:
   just:
@@ -43,6 +46,10 @@ parts:
         - CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
         - CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
         - CC: aarch64-linux-gnu-gcc
+      - to riscv64:
+        - CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc
+        - CARGO_BUILD_TARGET: riscv64gc-unknown-linux-gnu
+        - CC: riscv64-linux-gnu-gcc
     build-packages:
       - to amd64:
         - mingw-w64
@@ -50,6 +57,10 @@ parts:
         - gcc-aarch64-linux-gnu
         - linux-libc-dev-arm64-cross
         - libc6-dev-arm64-cross
+      - to riscv64:
+        - gcc-riscv64-linux-gnu
+        - linux-libc-dev-riscv64-cross
+        - libc6-dev-riscv64-cross
     build-attributes:
       - enable-patchelf
     override-build: |
