@@ -3,6 +3,17 @@ summary: Check the version output
 environment:
   SNAP_VERSION: "$(sed -n 's/^version: //p' ${PROJECT_PATH}/snap/snapcraft.yaml)"
 
+prepare: |
+  # Leave no pre-existing "just" snap around so we're sure to test the
+  # freshly-built artifact rather than whatever happens to already be there.
+  if snap list just >/dev/null 2>&1; then
+    snap remove --purge just
+  fi
+  snap install --classic --dangerous "$CRAFT_ARTIFACT"
+
+restore: |
+  snap remove --purge just
+
 execute: |
   printenv
   echo "+ Shell is $SHELL"
