@@ -25,6 +25,12 @@ platforms:
   riscv64:
     build-on: ["amd64", "riscv64"]
     build-for: ["riscv64"]
+  s390x:
+    build-on: ["amd64", "s390x"]
+    build-for: ["s390x"]
+  ppc64el:
+    build-on: ["amd64", "ppc64el"]
+    build-for: ["ppc64el"]
 parts:
   just:
     plugin: rust
@@ -43,6 +49,14 @@ parts:
           - CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc
           - CARGO_BUILD_TARGET: riscv64gc-unknown-linux-gnu
           - CC: riscv64-linux-gnu-gcc
+      - to s390x:
+          - CARGO_TARGET_S390X_UNKNOWN_LINUX_GNU_LINKER: s390x-linux-gnu-gcc
+          - CARGO_BUILD_TARGET: s390x-unknown-linux-gnu
+          - CC: s390x-linux-gnu-gcc
+      - to ppc64el:
+          - CARGO_TARGET_POWERPC64LE_UNKNOWN_LINUX_GNU_LINKER: powerpc64le-linux-gnu-gcc
+          - CARGO_BUILD_TARGET: powerpc64le-unknown-linux-gnu
+          - CC: powerpc64le-linux-gnu-gcc
     build-packages:
       - to amd64:
           - mingw-w64
@@ -54,6 +68,14 @@ parts:
           - gcc-riscv64-linux-gnu
           - linux-libc-dev-riscv64-cross
           - libc6-dev-riscv64-cross
+      - to s390x:
+          - gcc-s390x-linux-gnu
+          - linux-libc-dev-s390x-cross
+          - libc6-dev-s390x-cross
+      - to ppc64el:
+          - gcc-powerpc64le-linux-gnu
+          - linux-libc-dev-ppc64el-cross
+          - libc6-dev-ppc64el-cross
     build-attributes:
       - enable-patchelf
     override-build: |
