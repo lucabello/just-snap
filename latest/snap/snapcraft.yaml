@@ -1,7 +1,7 @@
 name: just
 title: just (by casey)
 base: core24
-version: 1.58.0
+version: 1.59.0
 summary: "\U0001F916 Just a command runner."
 description: "just is a handy way to save and run project-specific commands. \nCommands, called recipes, are stored in a file called justfile with syntax inspired by make.\n"
 contact: luca.bello@canonical.com
